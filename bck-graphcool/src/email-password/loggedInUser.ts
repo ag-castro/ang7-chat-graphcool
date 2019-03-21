@@ -1,4 +1,4 @@
-import { fromEvent, FunctionEvent } from 'graphcool-lib';
+import { default as Graphcool, fromEvent, FunctionEvent } from 'graphcool-lib';
 import { GraphQLClient } from 'graphql-request';
 
 interface User {
@@ -15,8 +15,8 @@ export default async (event: FunctionEvent<{}>) => {
     }
 
     const userId = event.context.auth.nodeId;
-    const graphcool = fromEvent(event);
-    const api = graphcool.api('simple/v1');
+    const graphcool: Graphcool = fromEvent<{}>(event);
+    const api: GraphQLClient = graphcool.api('simple/v1');
 
     // get user by id
     const user: User = await getUser(api, userId)
