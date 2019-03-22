@@ -1,4 +1,5 @@
-import { Component } from '@angular/core';
+import { Component, Input } from '@angular/core';
+import { MatSidenav } from '@angular/material';
 import { AuthService } from './../../../core/services/auth.service';
 import { Title } from '@angular/platform-browser';
 
@@ -13,6 +14,8 @@ export class DashboardHeaderComponent {
     private authService: AuthService,
     public title: Title
   ) { }
+
+  @Input() sidenav: MatSidenav;
 
   onLogout(): void {
     this.authService.logout();

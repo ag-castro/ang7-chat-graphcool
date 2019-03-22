@@ -1,2 +1,28 @@
-<app-dashboard-header></app-dashboard-header>
-<app-dashboard-resources></app-dashboard-resources>
+<mat-sidenav-container class="sidenav-container">
+
+  <mat-sidenav #sidenav class="sidenav-menu">
+    <mat-toolbar class="mat-elevation-z2" color="accent">Menu</mat-toolbar>
+    <app-dashboard-resources
+      [isMenu]="true"
+      (close)="sidenav.close()">
+
+      <mat-divider></mat-divider>
+
+      <mat-list-item (click)="onLogOut(sidenav)">
+        <mat-icon matListIcon>arrow_forward</mat-icon>
+        <h3 matLine>Logout</h3>
+      </mat-list-item>
+
+    </app-dashboard-resources>
+  </mat-sidenav>
+
+  <mat-sidenav-content>
+      <app-dashboard-header [sidenav]="sidenav"></app-dashboard-header>
+      <router-outlet></router-outlet>
+  </mat-sidenav-content>
+
+</mat-sidenav-container>
+
+
+
+

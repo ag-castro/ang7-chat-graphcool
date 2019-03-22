@@ -12,7 +12,8 @@ import {
   MatSlideToggleModule,
   MatListModule,
   MatIconModule,
-  MatLineModule
+  MatLineModule,
+  MatSidenavModule
 } from '@angular/material';
 
 @NgModule({
@@ -26,6 +27,7 @@ import {
     MatLineModule,
     MatListModule,
     MatToolbarModule,
+    MatSidenavModule,
     MatSnackBarModule,
     MatSlideToggleModule,
     MatProgressSpinnerModule,
