@@ -11,7 +11,7 @@ export class DashboardHeaderComponent {
 
   constructor(
     private authService: AuthService,
-    private title: Title
+    public title: Title
   ) { }
 
   onLogout(): void {
