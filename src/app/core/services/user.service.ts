@@ -14,7 +14,7 @@ export class UserService {
     private apollo: Apollo
   ) { }
 
-  allUsers(): Observable<User[]> {
+  public allUsers(): Observable<User[]> {
     return this.apollo.query<AllUsersQuery>({
       query: ALL_USERS_QUERY
     }).pipe(
