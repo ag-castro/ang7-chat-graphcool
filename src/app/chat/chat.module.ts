@@ -1,12 +1,13 @@
 import { NgModule } from '@angular/core';
-import { CommonModule } from '@angular/common';
-
 import { ChatRoutingModule } from './chat-routing.module';
+import { SharedModule } from '../shared/shared.module';
+import { ChatTabComponent } from './components/chat-tab/chat-tab.component';
+import { ChatUsersComponent } from './components/chat-users/chat-users.component';
 
 @NgModule({
-  declarations: [],
+  declarations: [ChatTabComponent, ChatUsersComponent],
   imports: [
-    CommonModule,
+    SharedModule,
     ChatRoutingModule
   ]
 })
