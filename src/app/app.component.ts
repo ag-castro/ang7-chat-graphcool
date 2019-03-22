@@ -1,11 +1,38 @@
-import { Component } from '@angular/core';
+import { ErrorService } from './core/services/error.service';
+import { Component, OnInit } from '@angular/core';
+import { AuthService } from './core/services/auth.service';
+import { take } from 'rxjs/operators';
+import { MatSnackBar } from '@angular/material';
 
 
 @Component({
   selector: 'app-root',
   template: `
-   <p>App Compopnent</p>
-   <app-login></app-login>
+   <router-outlet></router-outlet>
   `,
 })
-export class AppComponent {}
+export class AppComponent implements OnInit {
+  constructor(
+    private authService: AuthService,
+    private errorService: ErrorService,
+    private snackBar: MatSnackBar
+    ) {}
+
+  ngOnInit(): void {
+    this.authService.autoLogin()
+      .pipe(take(1))
+      .subscribe(
+        null,
+        error => {
+          const message = this.errorService.getErrorMessage(error);
+          this.snackBar.open(
+            `Unexpected error: ${message}`,
+            'OK',
+            {duration: 5000, verticalPosition: 'top', horizontalPosition: 'right' }
+          )
+        }
+      );
+  }
+
+
+}

@@ -1,0 +1,29 @@
+.login-container {
+  height: 90vh;
+  display: flex;
+  justify-content: center;
+  align-content: center;
+  align-items: center;
+}
+.form-login {
+  padding-top: 1.2rem;
+}
+mat-card {
+  width: 320px;
+}
+
+form {
+  display: flex;
+  flex-direction: column;
+
+  .toggle-btn {
+    margin-bottom: .3rem;
+  }
+
+  .btn-container {
+    margin-top: 1rem;
+    display: grid;
+    grid-template-columns: repeat(2, 1fr);
+    grid-gap: 1rem;
+  }
+}

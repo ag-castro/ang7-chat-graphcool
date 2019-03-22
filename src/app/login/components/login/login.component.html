@@ -1,3 +1,40 @@
-<p>
-  login works!
-</p>
+<div class="login-container">
+  <mat-card>
+      <mat-card-title>
+          <mat-toolbar color="primary">
+              <span>{{ configs.actionText }}</span>
+              <span class="spacer"></span>
+              <mat-spinner diameter="30" strokeWidth="2" *ngIf="configs.isLoading"></mat-spinner>
+            </mat-toolbar>
+      </mat-card-title>
+      <mat-card-content>
+          <form (submit)="onSubmit()" [formGroup]='loginForm' class="form-login">
+
+            <mat-form-field *ngIf="!configs.isLogin">
+              <input matInput type="text" placeholder="Seu nome" formControlName="name">
+              <mat-error *ngIf="name.hasError('required')">Campo Obrigatório!</mat-error>
+              <mat-error *ngIf="name.hasError('minlength')">Digite um nome com no mínimo 5 caracteres.</mat-error>
+            </mat-form-field>
+
+            <mat-form-field>
+              <input formControlName="email" matInput type="email" placeholder="E-mail">
+              <mat-error *ngIf="email.hasError('required')">Campo Obrigatório!</mat-error>
+              <mat-error *ngIf="email.hasError('email')">E-mail inválido!</mat-error>
+            </mat-form-field>
+            <mat-form-field>
+              <input formControlName="password" matInput type="password" placeholder="Password">
+              <mat-error *ngIf="password.hasError('required')">Campo Obrigatório!</mat-error>
+              <mat-error *ngIf="password.hasError('minlength')">Sua senha deve conter no mínimo 5 caracteres.</mat-error>
+            </mat-form-field>
+            <div class="btn-container">
+              <mat-slide-toggle class="toggle-btn" [checked]="authService.keepSigned" (change)="onKeepSigned()" color="primary">Manter Conectado</mat-slide-toggle>
+              <mat-slide-toggle class="toggle-btn" [checked]="authService.rememberMe" (change)="onRememberMe()" color="primary">Lembrar-me</mat-slide-toggle>
+            </div>
+            <div class="btn-container">
+              <button type="button" mat-raised-button (click)="changeAction()">{{ configs.buttonActionText }}</button>
+              <button [disabled]="loginForm.invalid" mat-raised-button color="primary" type="submit">{{ configs.actionText }}</button>
+            </div>
+          </form>
+      </mat-card-content>
+  </mat-card>
+</div>
