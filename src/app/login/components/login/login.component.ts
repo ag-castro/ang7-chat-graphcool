@@ -1,4 +1,5 @@
 import { Component, OnInit, OnDestroy } from '@angular/core';
+import { Router } from '@angular/router';
 import { FormGroup, FormBuilder, Validators, FormControl } from '@angular/forms';
 import { MatSnackBar } from '@angular/material';
 import {takeWhile} from 'rxjs/operators';
@@ -31,6 +32,7 @@ export class LoginComponent implements OnInit, OnDestroy {
     public authService: AuthService,
     private errorService: ErrorService,
     private formBuilder: FormBuilder,
+    private router: Router,
     private snackBar: MatSnackBar
   ) { }
 
@@ -63,11 +65,10 @@ export class LoginComponent implements OnInit, OnDestroy {
       takeWhile(() => this.alive)
     ).subscribe(
       res => {
-        console.log('redirecting...', res);
-
         this.authService.setRememberMe(this.loginForm.value);
         const redirect: string = this.authService.redirectURL || '/dashboard';
         console.log('route redirecting...', redirect);
+        this.router.navigate([redirect]);
         this.authService.redirectURL = null;
         this.configs.isLoading = false;
       },
