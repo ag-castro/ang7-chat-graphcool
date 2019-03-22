@@ -2,6 +2,7 @@ import { Component, OnInit } from '@angular/core';
 import { Observable } from 'rxjs';
 import { User } from '../../../core/models/user.model';
 import { UserService } from '../../../core/services/user.service';
+import { AuthService } from '../../../core/services/auth.service';
 
 @Component({
   selector: 'app-chat-users',
@@ -11,13 +12,14 @@ import { UserService } from '../../../core/services/user.service';
 export class ChatUsersComponent implements OnInit {
 
   constructor(
+    private authService: AuthService,
     private userService: UserService
   ) { }
 
   users$: Observable<User[]>;
 
   ngOnInit() {
-    this.users$ = this.userService.allUsers();
+    this.users$ = this.userService.allUsers(this.authService.authUser.id);
   }
 
 }
