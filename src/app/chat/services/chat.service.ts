@@ -1,5 +1,4 @@
 import { Injectable } from '@angular/core';
-import { ChatModule } from '../chat.module';
 import { Observable } from 'rxjs';
 import { map } from 'rxjs/operators';
 import { Chat } from '../models/chat.model';
@@ -8,7 +7,7 @@ import { AuthService } from '../../core/services/auth.service';
 import { AllChatsQuery, USER_CHATS_QUERY } from './chat.graphql';
 
 @Injectable({
-  providedIn: ChatModule
+  providedIn: 'root'
 })
 export class ChatService {
 
