@@ -2,7 +2,7 @@
   <ng-container *ngIf="chats$ | async as chats; else loadingChats">
     <ng-container *ngIf="chats.length > 0; else noUsers">
       <a mat-list-item [routerLink]="[chat.id]" *ngFor="let chat of chats">
-        <img matListAvatar src="assets/images/chat-no-photo.png" [title]="getChatTitle(chat)">
+        <img matListAvatar src="assets/images/user-no-photo.png" [title]="getChatTitle(chat)" alt="{{getChatTitle(chat)}}">
         <h3 matLine>{{getChatTitle(chat)}}</h3>
         <small matLine>{{getLastMessage(chat)}}</small>
       </a>
