@@ -16,6 +16,7 @@ import {
   MatSidenavModule,
   MatTabsModule
 } from '@angular/material';
+import { NoRecordComponent } from './components/no-record/no-record.component';
 
 @NgModule({
   exports: [
@@ -34,6 +35,9 @@ import {
     MatProgressSpinnerModule,
     MatTabsModule,
     ReactiveFormsModule,
-  ]
+    NoRecordComponent
+  ],
+  imports: [MatIconModule],
+  declarations: [NoRecordComponent]
 })
 export class SharedModule { }
