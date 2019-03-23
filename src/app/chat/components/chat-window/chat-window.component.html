@@ -6,9 +6,9 @@
 
 <mat-toolbar color="accent" class="footer">
   <mat-toolbar-row>
-    <input type="text" placeholder="Digite sua mensagem..." class="input-chat">
+    <input type="text" [(ngModel)]="newMessage" (keyup.enter)="sendMessage()" placeholder="Digite sua mensagem..." class="input-chat">
     <span class="spacer"></span>
-    <button mat-icon-button>
+    <button mat-icon-button (click)="sendMessage()">
       <mat-icon color="primary">send</mat-icon>
     </button>
   </mat-toolbar-row>

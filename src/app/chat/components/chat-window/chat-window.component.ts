@@ -8,6 +8,7 @@ import { UserService } from '../../../core/services/user.service';
 import { User } from '../../../core/models/user.model';
 import { Message } from '../../models/message.model';
 import { MessageService } from '../../services/message.service';
+import { AuthService } from '../../../core/services/auth.service';
 
 @Component({
   selector: 'app-chat-window',
@@ -17,6 +18,7 @@ import { MessageService } from '../../services/message.service';
 export class ChatWindowComponent implements OnInit, OnDestroy {
 
   constructor(
+    private authService: AuthService,
     private messageService: MessageService,
     private route: ActivatedRoute,
     private title: Title,
@@ -25,6 +27,7 @@ export class ChatWindowComponent implements OnInit, OnDestroy {
 
   public chat: Chat;
   public messages$: Observable<Message[]>;
+  public newMessage = '';
   public recipientID: string = null;
   private subscriptions: Subscription[] = [];
 
@@ -49,6 +52,18 @@ export class ChatWindowComponent implements OnInit, OnDestroy {
         )
         .subscribe()
     );
+  }
+
+  sendMessage(): void {
+    this.newMessage = this.newMessage.trim();
+    if (this.newMessage) {
+      this.messageService.createMessage({
+        text: this.newMessage,
+        chatId: this.chat.id,
+        senderId: this.authService.authUser.id
+      }).subscribe(console.log);
+      this.newMessage = '';
+    }
   }
 
   ngOnDestroy(): void {
