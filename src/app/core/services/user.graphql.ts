@@ -9,6 +9,15 @@ export interface UserQuery {
   User: User;
 }
 
+const userFragment = gql`
+  fragment UserFragment on User {
+    id
+    name
+    email
+    createdAt
+  }
+`;
+
 export const ALL_USERS_QUERY = gql`
   query AllUserQuery($idToExclude: ID!) {
     allUsers(
@@ -17,21 +26,17 @@ export const ALL_USERS_QUERY = gql`
       id_not: $idToExclude
     }
     ){
-      id
-      name
-      email
-      createdAt
+      ...UserFragment
     }
   }
+  ${userFragment}
 `;
 
 export const GET_USER_BY_ID_QUERY = gql`
   query GetUserByIdQuery($userId: ID!) {
     User(id: $userId) {
-      id
-      name
-      email
-      createdAt
+      ...UserFragment
     }
   }
+  ${userFragment}
 `;
