@@ -22,7 +22,7 @@ export class ChatListComponent extends BaseComponent<Chat> implements OnInit {
   public chats$: Observable<Chat[]>;
 
   ngOnInit() {
-    this.chats$ = this.chatService.getUserChats();
+    this.chats$ = this.chatService.chats$;
   }
 
   getChatTitle(chat: Chat): string {
