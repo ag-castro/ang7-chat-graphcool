@@ -54,7 +54,7 @@ export class ChatService {
         targetUserId: chatOrUserId
       }
     }).pipe(
-      map(res => (res.data.Chat) ? res.data.Chat : res.data.allChats[0])
+      map(res => (res.data['Chat']) ? res.data['Chat'] : res.data['allChats'][0])
     );
   }
 
