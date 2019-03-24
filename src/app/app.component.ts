@@ -3,6 +3,7 @@ import { Component, OnInit } from '@angular/core';
 import { AuthService } from './core/services/auth.service';
 import { take } from 'rxjs/operators';
 import { MatSnackBar } from '@angular/material';
+import { AppConfigService } from './core/services/app-config.service';
 
 
 @Component({
@@ -13,6 +14,7 @@ import { MatSnackBar } from '@angular/material';
 })
 export class AppComponent implements OnInit {
   constructor(
+    private appConfig: AppConfigService,
     private authService: AuthService,
     private errorService: ErrorService,
     private snackBar: MatSnackBar
