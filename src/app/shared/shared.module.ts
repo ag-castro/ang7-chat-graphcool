@@ -18,12 +18,14 @@ import {
 } from '@angular/material';
 import { NoRecordComponent } from './components/no-record/no-record.component';
 import { AvatarComponent } from './components/avatar/avatar.component';
+import { FromNowPipe } from './pipes/from-now.pipe';
 
 @NgModule({
   exports: [
     CommonModule,
-    FormsModule,
     AvatarComponent,
+    FormsModule,
+    FromNowPipe,
     MatCardModule,
     MatButtonModule,
     MatFormFieldModule,
@@ -44,6 +46,6 @@ import { AvatarComponent } from './components/avatar/avatar.component';
     CommonModule,
     MatIconModule
   ],
-  declarations: [NoRecordComponent, AvatarComponent]
+  declarations: [NoRecordComponent, AvatarComponent, FromNowPipe]
 })
 export class SharedModule { }
