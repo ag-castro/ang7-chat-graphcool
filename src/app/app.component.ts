@@ -31,7 +31,7 @@ export class AppComponent implements OnInit {
             `Unexpected error: ${message}`,
             'OK',
             {duration: 5000, verticalPosition: 'top', horizontalPosition: 'right' }
-          )
+          );
         }
       );
   }

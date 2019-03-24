@@ -3,19 +3,21 @@ import { Observable } from 'rxjs';
 import { Chat } from '../../models/chat.model';
 import { ChatService } from '../../services/chat.service';
 import { AuthService } from '../../../core/services/auth.service';
-import { send } from 'q';
+import { BaseComponent } from '../../../shared/components/base.component';
 
 @Component({
   selector: 'app-chat-list',
   templateUrl: './chat-list.component.html',
   styleUrls: ['./chat-list.component.scss']
 })
-export class ChatListComponent implements OnInit {
+export class ChatListComponent extends BaseComponent<Chat> implements OnInit {
 
   constructor(
     private authService: AuthService,
     private chatService: ChatService
-  ) { }
+  ) {
+    super();
+  }
 
   public chats$: Observable<Chat[]>;
 

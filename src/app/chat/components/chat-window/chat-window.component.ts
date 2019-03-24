@@ -10,13 +10,14 @@ import { Message } from '../../models/message.model';
 import { MessageService } from '../../services/message.service';
 import { AuthService } from '../../../core/services/auth.service';
 import { ChatService } from '../../services/chat.service';
+import { BaseComponent } from '../../../shared/components/base.component';
 
 @Component({
   selector: 'app-chat-window',
   templateUrl: './chat-window.component.html',
   styleUrls: ['./chat-window.component.scss']
 })
-export class ChatWindowComponent implements OnInit, OnDestroy {
+export class ChatWindowComponent extends BaseComponent<Message> implements OnInit, OnDestroy {
 
   constructor(
     public authService: AuthService,
@@ -25,7 +26,9 @@ export class ChatWindowComponent implements OnInit, OnDestroy {
     private route: ActivatedRoute,
     private title: Title,
     private userService: UserService
-  ) { }
+  ) {
+    super();
+  }
 
   public chat: Chat;
   public messages$: Observable<Message[]>;

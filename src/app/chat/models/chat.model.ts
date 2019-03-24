@@ -2,7 +2,7 @@ import { Message } from './message.model';
 import { User } from '../../core/models/user.model';
 
 export class Chat {
-  id?: string;
+  id: string;
   createdAt?: string;
   isGroup?: boolean;
   title?: string;
