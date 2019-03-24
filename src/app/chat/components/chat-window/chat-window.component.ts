@@ -1,7 +1,7 @@
 import { Component, OnDestroy, OnInit } from '@angular/core';
 import { Title } from '@angular/platform-browser';
 import { ActivatedRoute, ParamMap } from '@angular/router';
-import { Observable, Subscription } from 'rxjs';
+import { Observable, of, Subscription } from 'rxjs';
 import { map, mergeMap, take, tap } from 'rxjs/operators';
 import { Chat } from '../../models/chat.model';
 import { UserService } from '../../../core/services/user.service';
@@ -46,6 +46,7 @@ export class ChatWindowComponent implements OnInit, OnDestroy {
               this.userService.getUserById(this.recipientID)
                 .pipe(take(1))
                 .subscribe((user: User) => this.title.setTitle(user.name));
+              this.messages$ = of([]);
             } else {
               this.title.setTitle(this.chat.title || this.chat.users[0].name);
               this.messages$ = this.messageService.getChatMessages(this.chat.id);
