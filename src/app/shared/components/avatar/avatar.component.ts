@@ -4,7 +4,7 @@ import { Component, Input } from '@angular/core';
   selector: 'app-avatar',
   template: `
     <div class="avatar-container" [ngStyle]="containerStyles">
-      <img [src]="src" [title]="title || 'Avatar'" [alt]="title || 'Avatar'" [ngStyle]="imageStyles" />
+      <img [src]="src" [title]="title || 'Avatar'" alt="title || 'Avatar'" [ngStyle]="imageStyles" />
       <ng-content></ng-content>
     </div>
   `,
