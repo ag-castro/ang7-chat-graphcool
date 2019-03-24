@@ -19,7 +19,7 @@ import { ChatService } from '../../services/chat.service';
 export class ChatWindowComponent implements OnInit, OnDestroy {
 
   constructor(
-    private authService: AuthService,
+    public authService: AuthService,
     private chatService: ChatService,
     private messageService: MessageService,
     private route: ActivatedRoute,
