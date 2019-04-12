@@ -14,7 +14,7 @@ import {
   MatIconModule,
   MatLineModule,
   MatSidenavModule,
-  MatTabsModule
+  MatTabsModule, MatMenuModule
 } from '@angular/material';
 import { NoRecordComponent } from './components/no-record/no-record.component';
 import { AvatarComponent } from './components/avatar/avatar.component';
@@ -33,6 +33,7 @@ import { FromNowPipe } from './pipes/from-now.pipe';
     MatInputModule,
     MatLineModule,
     MatListModule,
+    MatMenuModule,
     MatToolbarModule,
     MatSidenavModule,
     MatSnackBarModule,

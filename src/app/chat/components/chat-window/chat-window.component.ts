@@ -51,6 +51,8 @@ export class ChatWindowComponent extends BaseComponent<Message> implements After
   @ViewChildren(ChatMessageComponent) private messagesQueryList: QueryList<ChatMessageComponent>;
 
   ngOnInit(): void {
+    this.chatService.startChatMonitoring();
+    this.userService.startUserMonitoring(this.authService.authUser.id);
     this.title.setTitle('Loading...');
     this.subscriptions.push(
       this.route.data

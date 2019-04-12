@@ -3,16 +3,19 @@ import { NavigationEnd, Router, RouterEvent } from '@angular/router';
 import { Observable, Subscription } from 'rxjs';
 import { map } from 'rxjs/operators';
 import { Chat } from '../models/chat.model';
-import { Apollo } from 'apollo-angular';
+import { Apollo, QueryRef } from 'apollo-angular';
 import { AuthService } from '../../core/services/auth.service';
 import {
   AllChatsQuery,
   CHAT_BY_ID_OR_USERS_QUERY,
   ChatQuery,
   CREATE_PRIVATE_CHAT_MUTATION,
-  USER_CHATS_QUERY
+  USER_CHATS_QUERY, USER_CHATS_SUBSCRIPTION
 } from './chat.graphql';
 import { DataProxy } from 'apollo-cache';
+import { AllMessagesQuery, GET_CHAT_MESSAGES_QUERY, USER_MESSAGES_SUBSCRIPTION } from './message.graphql';
+import { Message } from '../models/message.model';
+import { UserService } from '../../core/services/user.service';
 
 @Injectable({
   providedIn: 'root'
@@ -22,29 +25,100 @@ export class ChatService {
   constructor(
     private apollo: Apollo,
     private authService: AuthService,
-    private router: Router
+    private router: Router,
+    private userService: UserService
   ) { }
 
   public chats$: Observable<Chat[]>;
+  private queryRef: QueryRef<AllChatsQuery>;
   private subscriptions: Subscription[] = [];
 
   startChatMonitoring(): void {
-    this.chats$ = this.getUserChats();
-    this.subscriptions.push(this.chats$.subscribe());
-    this.router.events.subscribe((event: RouterEvent) => {
-      if (event instanceof NavigationEnd && !this.router.url.includes('chat')) {
-        this.onDestroy();
-      }
-    });
+    if (!this.chats$) {
+      this.chats$ = this.getUserChats();
+      this.subscriptions.push(this.chats$.subscribe());
+      this.subscriptions.push(
+        this.router.events.subscribe((event: RouterEvent) => {
+          if (event instanceof NavigationEnd && !this.router.url.includes('chat')) {
+            this.stopChatsMonitoring();
+            this.userService.stopUsersMonitoring();
+          }
+        })
+      );
+    }
+  }
+
+  private stopChatsMonitoring(): void {
+    this.subscriptions.forEach(subs => subs.unsubscribe());
+    this.subscriptions = [];
+    this.chats$ = null;
   }
 
   getUserChats(): Observable<Chat[]> {
-    return this.apollo.watchQuery<AllChatsQuery>({
+    this.queryRef = this.apollo.watchQuery<AllChatsQuery>({
       query: USER_CHATS_QUERY,
       variables: {
         loggedUserId: this.authService.authUser.id
+      },
+      fetchPolicy: 'network-only'
+    });
+
+    this.queryRef.subscribeToMore({
+      document: USER_CHATS_SUBSCRIPTION,
+      variables: {loggedUserId: this.authService.authUser.id},
+      updateQuery: (previous: AllChatsQuery, { subscriptionData }): AllChatsQuery => {
+        const newChat: Chat = subscriptionData.data['Chat'].node;
+        if (previous.allChats.every(chat => chat.id !== newChat.id)) {
+          return {
+            ...previous,
+            allChats: [newChat, ...previous.allChats]
+          };
+        }
+        return previous;
       }
-    }).valueChanges
+    });
+
+    this.queryRef.subscribeToMore({
+      document: USER_MESSAGES_SUBSCRIPTION,
+      variables: {loggedUserId: this.authService.authUser.id},
+      updateQuery: (previous: AllChatsQuery, { subscriptionData }): AllChatsQuery => {
+        const newMessage: Message = subscriptionData.data['Message'].node;
+        try {
+          if (newMessage.sender.id !== this.authService.authUser.id) {
+            const apolloClient = this.apollo.getClient();
+            const chatMessagesVariables = {chatId: newMessage.chat.id};
+            const chatMessagesData = apolloClient.readQuery<AllMessagesQuery>({
+              query: GET_CHAT_MESSAGES_QUERY,
+              variables: chatMessagesVariables
+            });
+            chatMessagesData.allMessages = [...chatMessagesData.allMessages, newMessage];
+            apolloClient.writeQuery({
+              query: GET_CHAT_MESSAGES_QUERY,
+              variables: chatMessagesVariables,
+              data: chatMessagesData
+            });
+          }
+        } catch (e) {
+          console.log('AllMessagesQuery not found');
+        }
+
+        const chatToUpdateIndex: number = previous.allChats
+          ? previous.allChats.findIndex(chat => chat.id === newMessage.chat.id)
+          : -1;
+        if (chatToUpdateIndex > -1) {
+          const newAllChats = [...previous.allChats];
+          const chatToUpdate: Chat = Object.assign({}, newAllChats[chatToUpdateIndex]);
+          chatToUpdate.messages = [newMessage];
+          newAllChats[chatToUpdateIndex] = chatToUpdate;
+          return {
+            ...previous,
+            allChats: newAllChats
+          };
+        }
+        return previous;
+      }
+    });
+    return this.queryRef.valueChanges
       .pipe(
       map(res => res.data.allChats),
       map((chats: Chat[]) => {
@@ -115,8 +189,4 @@ export class ChatService {
     );
   }
 
-  private onDestroy(): void {
-    this.subscriptions.forEach(subs => subs.unsubscribe());
-    this.subscriptions = [];
-  }
 }

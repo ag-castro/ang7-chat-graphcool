@@ -6,6 +6,7 @@ import { ChatUsersComponent } from './components/chat-users/chat-users.component
 import { ChatListComponent } from './components/chat-list/chat-list.component';
 import { ChatWindowComponent } from './components/chat-window/chat-window.component';
 import { ChatMessageComponent } from './components/chat-message/chat-message.component';
+import { ChatAddGroupComponent } from './components/chat-add-group/chat-add-group.component';
 
 @NgModule({
   declarations: [
@@ -13,7 +14,8 @@ import { ChatMessageComponent } from './components/chat-message/chat-message.com
     ChatUsersComponent,
     ChatListComponent,
     ChatWindowComponent,
-    ChatMessageComponent
+    ChatMessageComponent,
+    ChatAddGroupComponent
   ],
   imports: [
     SharedModule,

@@ -12,6 +12,7 @@ import {
 } from './auth.graphql';
 import { StorageKeys } from '../../utils/storage-keys';
 import { User } from '../models/user.model';
+import { ApolloConfigModule } from '../../apollo-config.module';
 
 
 @Injectable({
@@ -21,6 +22,7 @@ export class AuthService {
 
   constructor(
     private  apollo: Apollo,
+    private apolloConfigModule: ApolloConfigModule,
     private router: Router,
     ) {
       this.isAuthenticated.subscribe(is => console.log('AuthState:', is));
@@ -68,8 +70,10 @@ export class AuthService {
   }
 
   logout(): void {
+    this.apolloConfigModule.closeWebSocketConnection();
     window.localStorage.removeItem(StorageKeys.AUTH_TOKEN);
     window.localStorage.removeItem(StorageKeys.KEEP_SIGNED);
+    this.apolloConfigModule.cachePersistor.purge();
     this.keepSigned = false;
     this._isAuthenticate.next(false);
     this.router.navigate(['/login']);
@@ -88,7 +92,7 @@ export class AuthService {
           const token = window.localStorage.getItem(StorageKeys.AUTH_TOKEN);
           this.setAuthState({
             id: authData.id, token, isAuthenticated: authData.isAuthenticated
-          });
+          }, true);
         }),
         mergeMap(res => of()),
         catchError(error => {
@@ -100,7 +104,8 @@ export class AuthService {
 
   private validateToken(): Observable<{id: string, isAuthenticated: boolean}> {
     return this.apollo.query<LoggedInUserQuery>({
-      query: LOGGED_IN_USER_QUERY
+      query: LOGGED_IN_USER_QUERY,
+      fetchPolicy: 'network-only'
     }).pipe(
       map(res => {
         const user = res.data.loggedInUser;
@@ -108,16 +113,21 @@ export class AuthService {
           id: user && user.id,
           isAuthenticated: user !== null
         };
-      })
+      }),
+      mergeMap(authData => authData.isAuthenticated
+        ? of(authData)
+        : throwError(new Error('Invalid Token!')))
     );
   }
 
-  private setAuthState(authData: {
-    id: string, token: string, isAuthenticated: boolean
-  }): void {
+  private setAuthState(authData: { id: string, token: string, isAuthenticated: boolean },
+                       isRefresh: boolean = false): void {
     if (authData.isAuthenticated) {
       window.localStorage.setItem(StorageKeys.AUTH_TOKEN, authData.token);
       this.authUser = {id: authData.id};
+      if (!isRefresh) {
+        this.apolloConfigModule.closeWebSocketConnection();
+      }
     }
     this._isAuthenticate.next(authData.isAuthenticated);
   }
