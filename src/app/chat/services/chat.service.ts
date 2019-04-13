@@ -8,7 +8,7 @@ import { AuthService } from '../../core/services/auth.service';
 import {
   AllChatsQuery,
   CHAT_BY_ID_OR_USERS_QUERY,
-  ChatQuery,
+  ChatQuery, CREATE_GROUP_MUTATION,
   CREATE_PRIVATE_CHAT_MUTATION,
   USER_CHATS_QUERY, USER_CHATS_SUBSCRIPTION
 } from './chat.graphql';
@@ -16,18 +16,21 @@ import { DataProxy } from 'apollo-cache';
 import { AllMessagesQuery, GET_CHAT_MESSAGES_QUERY, USER_MESSAGES_SUBSCRIPTION } from './message.graphql';
 import { Message } from '../models/message.model';
 import { UserService } from '../../core/services/user.service';
+import { BaseService } from '../../core/services/base.service';
 
 @Injectable({
   providedIn: 'root'
 })
-export class ChatService {
+export class ChatService extends BaseService {
 
   constructor(
     private apollo: Apollo,
     private authService: AuthService,
     private router: Router,
     private userService: UserService
-  ) { }
+  ) {
+    super();
+  }
 
   public chats$: Observable<Chat[]>;
   private queryRef: QueryRef<AllChatsQuery>;
@@ -157,31 +160,71 @@ export class ChatService {
         targetUserId,
       },
       update: (store: DataProxy, {data: {createChat}}) => {
-        const userChatsVariables = { loggedUserId: this.authService.authUser.id };
-        const userChatsData = store.readQuery<AllChatsQuery>({
+
+        this.readAndWriteQuery<Chat>({
+          store,
+          newRecord: createChat,
           query: USER_CHATS_QUERY,
-          variables: userChatsVariables
+          queryName: 'allChats',
+          arrayOperation: 'unshift',
+          variables: { loggedUserId: this.authService.authUser.id }
         });
-        userChatsData.allChats = [createChat, ...userChatsData.allChats];
-        store.writeQuery({
+
+        this.readAndWriteQuery<Chat>({
+          store,
+          newRecord: createChat,
+          query: CHAT_BY_ID_OR_USERS_QUERY,
+          queryName: 'allChats',
+          arrayOperation: 'singleRecord',
+          variables: {
+            chatId: targetUserId,
+            loggedUserId: this.authService.authUser.id,
+            targetUserId
+          }
+        });
+
+      }
+    }).pipe(
+      map(res => res.data.createChat)
+    );
+  }
+
+  createGroup(variables: {title: string, usersIds: string[]}): Observable<Chat> {
+    variables.usersIds.push(this.authService.authUser.id);
+    return this.apollo.mutate({
+      mutation: CREATE_GROUP_MUTATION,
+      variables: {
+        ...variables,
+        loggedUserId: this.authService.authUser.id
+      },
+      optimisticResponse: {
+        __typename: 'Mutation',
+        createChat: {
+          __typename: 'Chat',
+          id: '',
+          title: variables.title,
+          createdAt: new Date().toISOString(),
+          isGroup: true,
+          users: [
+            {
+              __typename: 'User',
+              id: '',
+              name: '',
+              email: '',
+              createdAt: new Date().toISOString()
+            }
+          ],
+          messages: []
+        }
+      },
+      update: (store: DataProxy, {data: {createChat}}) => {
+        this.readAndWriteQuery<Chat>({
+          store,
+          newRecord: createChat,
           query: USER_CHATS_QUERY,
-          variables: userChatsVariables,
-          data: userChatsData
-        });
-        const variables = {
-          chatId: targetUserId,
-          loggedUserId: this.authService.authUser.id,
-          targetUserId
-        };
-        const data = store.readQuery<AllChatsQuery>({
-          query: CHAT_BY_ID_OR_USERS_QUERY,
-          variables
-        });
-        data.allChats = [createChat];
-        store.writeQuery({
-          query: CHAT_BY_ID_OR_USERS_QUERY,
-          variables,
-          data
+          queryName: 'allChats',
+          arrayOperation: 'unshift',
+          variables: { loggedUserId: this.authService.authUser.id }
         });
       }
     }).pipe(

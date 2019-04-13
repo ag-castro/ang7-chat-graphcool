@@ -20,6 +20,9 @@ import { ChatAddGroupComponent } from './components/chat-add-group/chat-add-grou
   imports: [
     SharedModule,
     ChatRoutingModule
+  ],
+  entryComponents: [
+    ChatAddGroupComponent
   ]
 })
 export class ChatModule { }

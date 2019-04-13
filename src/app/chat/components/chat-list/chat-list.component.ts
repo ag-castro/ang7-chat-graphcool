@@ -4,6 +4,8 @@ import { Chat } from '../../models/chat.model';
 import { ChatService } from '../../services/chat.service';
 import { AuthService } from '../../../core/services/auth.service';
 import { BaseComponent } from '../../../shared/components/base.component';
+import { MatDialog } from '@angular/material';
+import { ChatAddGroupComponent } from '../chat-add-group/chat-add-group.component';
 
 @Component({
   selector: 'app-chat-list',
@@ -14,7 +16,8 @@ export class ChatListComponent extends BaseComponent<Chat> implements OnInit {
 
   constructor(
     private authService: AuthService,
-    private chatService: ChatService
+    private chatService: ChatService,
+    private dialog: MatDialog
   ) {
     super();
   }
@@ -29,6 +32,10 @@ export class ChatListComponent extends BaseComponent<Chat> implements OnInit {
     return chat.title || chat.users[0].name;
   }
 
+  getChatImage(chat: Chat): string {
+    return !chat.isGroup ? 'assets/images/user-no-photo.png' : 'assets/images/group-no-photo.png';
+  }
+
   getLastMessage(chat: Chat): string {
     const message = chat.messages[0];
     if (message) {
@@ -38,6 +45,10 @@ export class ChatListComponent extends BaseComponent<Chat> implements OnInit {
       return `${sender}: ${message.text}`;
     }
     return 'No messages';
+  }
+
+  onAddGroup(): void {
+    this.dialog.open(ChatAddGroupComponent, {width: '400px', height: '90vh'});
   }
 
 }
