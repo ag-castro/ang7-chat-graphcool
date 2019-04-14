@@ -2,6 +2,7 @@ import { User } from '../models/user.model';
 import gql from 'graphql-tag';
 
 export interface AllUsersQuery {
+  User: any;
   allUsers: User[];
 }
 
@@ -41,11 +42,24 @@ export const GET_USER_BY_ID_QUERY = gql`
   ${userFragment}
 `;
 
-export const NEW_USERS_SUBSCRIPTION = gql`
-  subscription NewUsersSubscription {
+export const UPDATE_USER_MUTATION = gql`
+  mutation UpdateUserMutation($id: ID!, $name: String!, $email: String!) {
+    updateUser(
+      id: $id,
+      name: $name,
+      email: $email
+    ) {
+      ...UserFragment
+    }
+  }
+  ${userFragment}
+`;
+
+export const USERS_SUBSCRIPTION = gql`
+  subscription UsersSubscription {
     User(
       filter: {
-        mutation_in: [CREATED]
+        mutation_in: [CREATED, UPDATED]
       }
     ) {
       mutation

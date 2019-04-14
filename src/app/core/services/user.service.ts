@@ -7,7 +7,7 @@ import {
   ALL_USERS_QUERY,
   AllUsersQuery,
   GET_USER_BY_ID_QUERY,
-  NEW_USERS_SUBSCRIPTION,
+  USERS_SUBSCRIPTION, UPDATE_USER_MUTATION,
   UserQuery
 } from './user.graphql';
 
@@ -46,14 +46,26 @@ export class UserService {
       fetchPolicy: 'network-only'
     });
     this.queryRef.subscribeToMore({
-      document: NEW_USERS_SUBSCRIPTION,
+      document: USERS_SUBSCRIPTION,
       updateQuery: (previous: AllUsersQuery, {subscriptionData}): AllUsersQuery => {
-        const newUser: User = subscriptionData.data['User'].node;
+        const subscriptionUser: User = subscriptionData.data.User.node;
+        const newAllUsers: User[] = [...previous.allUsers];
+        switch (subscriptionData.data.User.mutation) {
+          case 'CREATED':
+            newAllUsers.unshift(subscriptionUser);
+            break;
+          case 'UPDATED':
+            const userToUpdateIndex: number = newAllUsers.findIndex(usr => usr.id === subscriptionUser.id);
+            if (userToUpdateIndex > -1) {
+              newAllUsers[userToUpdateIndex] = subscriptionUser;
+            }
+        }
         return {
           ...previous,
-          allUsers: ([newUser, ...previous.allUsers]).sort((uA, uB) => {
+          allUsers: newAllUsers.sort((uA, uB) => {
             if (uA.name < uB.name) { return -1; }
             if (uA.name > uB.name) { return 1; }
+            return 0;
           })
         };
       }
@@ -70,6 +82,19 @@ export class UserService {
       variables: {userId: id}
     }).pipe(
       map(res => res.data.User)
+    );
+  }
+
+  updateUser(user: User): Observable<User> {
+    return this.apollo.mutate({
+      mutation: UPDATE_USER_MUTATION,
+      variables: {
+        id: user.id,
+        name: user.name,
+        email: user.email
+      }
+    }).pipe(
+      map(res => res.data.updateUser)
     );
   }
 }
