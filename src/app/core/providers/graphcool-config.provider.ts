@@ -14,7 +14,7 @@ export const graphcoolConfig: GraphcoolConfig = {
   subscriptionsAPI: `wss://subscriptions.graph.cool/v1/${graphcoolID}`,
   fileAPI: ` https://api.graph.cool/file/v1/${graphcoolID}`,
   fileDownloadURL: `https://files.graph.cool/${graphcoolID}`
-}
+};
 
 export const GRAPHCOOL_CONFIG = new InjectionToken<GraphcoolConfig>(
   'graphcool.config',
