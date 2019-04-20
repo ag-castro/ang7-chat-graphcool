@@ -8,6 +8,7 @@ import { map } from 'rxjs/operators';
 import { AllChatsQuery, USER_CHATS_QUERY } from './chat.graphql';
 import { AuthService } from '../../core/services/auth.service';
 import { BaseService } from '../../core/services/base.service';
+import { User } from '../../core/models/user.model';
 
 @Injectable({
   providedIn: 'root'
@@ -28,7 +29,12 @@ export class MessageService extends BaseService{
       fetchPolicy: 'network-only'
     }).valueChanges
       .pipe(
-        map(res => res.data.allMessages)
+        map(res => res.data.allMessages),
+        map(messages => messages.map(msg => {
+          const message = Object.assign({}, msg);
+          message.sender = new User(message.sender);
+          return message;
+        }))
       );
   }
 
@@ -48,7 +54,12 @@ export class MessageService extends BaseService{
             id: message.senderId,
             name: '',
             email: '',
-            createdAt: ''
+            createdAt: '',
+            photo: {
+              __typename: 'File',
+              id: '',
+              secret: this.authService.authUser.photo && this.authService.authUser.photo.secret || '',
+            },
           },
           chat: {
             __typename: 'Chat',

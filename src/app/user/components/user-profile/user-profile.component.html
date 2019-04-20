@@ -3,8 +3,8 @@
     <div class="photo">
       <app-avatar
         mat-card-avatar
-        title="{{user.name}}"
-        src="assets/images/user-no-photo.png">
+        [title]="user.name"
+        [src]="user.getPhotoUrl()">
       </app-avatar>
       <button [disabled]="isLoading"
               mat-icon-button
@@ -12,6 +12,13 @@
               class="btn-edit-user"
               (click)="isEditing = !isEditing">
         <mat-icon>edit</mat-icon>
+      </button>
+      <input type="file" accept="image/*" [hidden]="true" #inputFile (change)="onSelectImage($event)">
+      <button [disabled]="isLoading"
+              mat-icon-button
+              color="primary"
+              class="btn-choose-photo" (click)="triggerInputFile(inputFile)">
+        <mat-icon>camera_alt</mat-icon>
       </button>
     </div>
   </mat-card-header>

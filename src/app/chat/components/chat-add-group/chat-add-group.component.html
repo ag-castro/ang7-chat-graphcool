@@ -1,4 +1,14 @@
 <h2 mat-dialog-title>New Chat Group</h2>
+<input type="file" accept="image/*" [hidden]="true" (change)="onSelectImage($event)" #inputFile>
+<div class="group-cover">
+  <app-avatar
+    [src]="(selectedImage | readFile | async) || 'assets/images/group-no-photo.png'"
+    title="Group cover">
+    <button (click)="inputFile.click()" mat-icon-button color="primary" class="btn-choose-photo">
+      <mat-icon>camera_alt</mat-icon>
+    </button>
+  </app-avatar>
+</div>
 <form [formGroup]="newGroupForm" (submit)="onSubmit()">
   <mat-dialog-content>
     <mat-form-field>

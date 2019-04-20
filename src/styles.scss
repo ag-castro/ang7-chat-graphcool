@@ -17,3 +17,6 @@ app-login .mat-spinner circle {
   position: fixed;
   bottom: 0;
 }
+.mat-dialog-no-padding .mat-dialog-container {
+  padding: 0;
+}

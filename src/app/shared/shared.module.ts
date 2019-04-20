@@ -19,6 +19,8 @@ import {
 import { NoRecordComponent } from './components/no-record/no-record.component';
 import { AvatarComponent } from './components/avatar/avatar.component';
 import { FromNowPipe } from './pipes/from-now.pipe';
+import { ImagePreviewComponent } from './components/image-preview/image-preview.component';
+import { ReadFilePipe } from './pipes/read-file.pipe';
 
 @NgModule({
   exports: [
@@ -26,6 +28,7 @@ import { FromNowPipe } from './pipes/from-now.pipe';
     AvatarComponent,
     FormsModule,
     FromNowPipe,
+    ImagePreviewComponent,
     MatCardModule,
     MatDialogModule,
     MatButtonModule,
@@ -42,12 +45,18 @@ import { FromNowPipe } from './pipes/from-now.pipe';
     MatProgressSpinnerModule,
     MatTabsModule,
     ReactiveFormsModule,
-    NoRecordComponent
+    NoRecordComponent,
+    ReadFilePipe
   ],
   imports: [
     CommonModule,
     MatIconModule,
+    MatCardModule,
+    MatToolbarModule,
+    MatButtonModule,
+    MatDialogModule
   ],
-  declarations: [NoRecordComponent, AvatarComponent, FromNowPipe]
+  declarations: [NoRecordComponent, AvatarComponent, FromNowPipe, ImagePreviewComponent, ReadFilePipe],
+  entryComponents: [ImagePreviewComponent]
 })
 export class SharedModule { }

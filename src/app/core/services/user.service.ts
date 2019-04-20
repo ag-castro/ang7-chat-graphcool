@@ -1,15 +1,17 @@
 import { Injectable } from '@angular/core';
 import { Apollo, QueryRef } from 'apollo-angular';
 import { Observable, Subscription } from 'rxjs';
-import { map } from 'rxjs/operators';
+import { map, mergeMap } from 'rxjs/operators';
 import { User } from '../models/user.model';
 import {
   ALL_USERS_QUERY,
   AllUsersQuery,
   GET_USER_BY_ID_QUERY,
   USERS_SUBSCRIPTION, UPDATE_USER_MUTATION,
-  UserQuery
+  UserQuery, getUpdateUserPhotoMutation
 } from './user.graphql';
+import { FileService } from './file.service';
+import { FileModel } from '../models/file.model';
 
 @Injectable({
   providedIn: 'root'
@@ -17,7 +19,8 @@ import {
 export class UserService {
 
   constructor(
-    private apollo: Apollo
+    private apollo: Apollo,
+    private fileService: FileService
   ) { }
 
   public users$: Observable<User[]>;
@@ -72,7 +75,8 @@ export class UserService {
     });
     return this.queryRef.valueChanges
       .pipe(
-        map(res => res.data.allUsers)
+        map(res => res.data.allUsers),
+        map(users => users.map(usr => new User(usr)))
       );
   }
 
@@ -81,7 +85,8 @@ export class UserService {
       query: GET_USER_BY_ID_QUERY,
       variables: {userId: id}
     }).pipe(
-      map(res => res.data.User)
+      map(res => res.data.User),
+      map(usr => new User(usr))
     );
   }
 
@@ -96,5 +101,23 @@ export class UserService {
     }).pipe(
       map(res => res.data.updateUser)
     );
+  }
+
+  updateUserPhoto(file: File, user: User): Observable<User> {
+    return this.fileService.upload(file)
+      .pipe(
+        mergeMap((newPhoto: FileModel) => {
+          return this.apollo.mutate({
+            mutation: getUpdateUserPhotoMutation(!!user.photo),
+            variables: {
+              loggedUserId: user.id,
+              newPhotoId: newPhoto.id,
+              oldPhotoId: (user.photo ? user.photo.id : null)
+            }
+          }).pipe(
+            map(res => res.data.updateUser)
+          );
+        })
+      );
   }
 }

@@ -1,5 +1,6 @@
 import gql from 'graphql-tag';
 import { Chat } from '../models/chat.model';
+import { fileFragment } from '../../core/services/file.graphql';
 
 export interface AllChatsQuery {
   allChats: Chat[];
@@ -15,6 +16,9 @@ const chatFragment = gql`
     title
     createdAt
     isGroup
+    photo {
+        ...FileFragment
+    }
     users (
       first: 1,
       filter: {
@@ -25,8 +29,12 @@ const chatFragment = gql`
       name
       email
       createdAt
+      photo {
+        ...FileFragment
+      }
     }
   }
+  ${fileFragment}
 `;
 
 const chatMessagesFragment = gql`
@@ -101,11 +109,12 @@ export const CREATE_PRIVATE_CHAT_MUTATION = gql`
 `;
 
 export const CREATE_GROUP_MUTATION = gql`
-  mutation CreateGroupMutation($title: String!, $usersIds: [ID!]!, $loggedUserId: ID!) {
+  mutation CreateGroupMutation($title: String!, $usersIds: [ID!]!, $loggedUserId: ID!, $photoId: ID) {
     createChat(
       title: $title,
       usersIds: $usersIds,
-      isGroup: true
+      isGroup: true,
+      photoId: $photoId
     ) {
       ...ChatFragment
       ...ChatMessagesFragment

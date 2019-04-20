@@ -17,6 +17,7 @@ import { AllMessagesQuery, GET_CHAT_MESSAGES_QUERY, USER_MESSAGES_SUBSCRIPTION }
 import { Message } from '../models/message.model';
 import { UserService } from '../../core/services/user.service';
 import { BaseService } from '../../core/services/base.service';
+import { User } from '../../core/models/user.model';
 
 @Injectable({
   providedIn: 'root'
@@ -123,19 +124,24 @@ export class ChatService extends BaseService {
     });
     return this.queryRef.valueChanges
       .pipe(
-      map(res => res.data.allChats),
-      map((chats: Chat[]) => {
-        const chatsToSort = chats.slice();
-        return chatsToSort.sort((a, b) => {
-          const valueA = a.messages.length > 0
-            ? new Date(a.messages[0].createdAt).getTime()
-            : new Date(a.createdAt).getTime();
-          const valueB = b.messages.length > 0
-            ? new Date(b.messages[0].createdAt).getTime()
-            : new Date(b.createdAt).getTime();
-          return valueB - valueA;
-        });
-      })
+        map(res => res.data.allChats),
+        map((chats: Chat[]) => {
+          const chatsToSort = chats.slice();
+          return chatsToSort.sort((a, b) => {
+            const valueA = a.messages.length > 0
+              ? new Date(a.messages[0].createdAt).getTime()
+              : new Date(a.createdAt).getTime();
+            const valueB = b.messages.length > 0
+              ? new Date(b.messages[0].createdAt).getTime()
+              : new Date(b.createdAt).getTime();
+            return valueB - valueA;
+          });
+        }),
+        map(chats => chats.map(cht => {
+          const chat = new Chat(cht);
+          chat.users = chat.users.map(usr => new User(usr));
+          return chat;
+        }))
     );
   }
 
@@ -189,7 +195,7 @@ export class ChatService extends BaseService {
     );
   }
 
-  createGroup(variables: {title: string, usersIds: string[]}): Observable<Chat> {
+  createGroup(variables: {title: string, usersIds: string[], photoId: string}): Observable<Chat> {
     variables.usersIds.push(this.authService.authUser.id);
     return this.apollo.mutate({
       mutation: CREATE_GROUP_MUTATION,
@@ -205,13 +211,23 @@ export class ChatService extends BaseService {
           title: variables.title,
           createdAt: new Date().toISOString(),
           isGroup: true,
+          photo: {
+            __typename: 'File',
+            id: '',
+            secret: '',
+          },
           users: [
             {
               __typename: 'User',
               id: '',
               name: '',
               email: '',
-              createdAt: new Date().toISOString()
+              createdAt: new Date().toISOString(),
+              photo: {
+                __typename: 'File',
+                id: '',
+                secret: '',
+              },
             }
           ],
           messages: []

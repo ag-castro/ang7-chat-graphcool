@@ -1,0 +1,20 @@
+<mat-card>
+  <mat-card-content>
+    <img mat-card-image *ngIf="selectedImage | readFile | async as imgSrc; else noImageTemplate"
+         [src]="imgSrc"
+         alt="{{ selectedImage ? selectedImage.name : 'No Photo' }}" />
+    <ng-template #noImageTemplate>
+      <p>No Image Selected.</p>
+    </ng-template>
+  </mat-card-content>
+</mat-card>
+<mat-toolbar color="warn">
+  <h1>{{ selectedImage ? selectedImage.name : 'No Photo' }}</h1>
+  <span class="spacer"></span>
+  <button mat-icon-button matDialogClose>
+    <mat-icon>close</mat-icon>
+  </button>
+  <button mat-icon-button [disabled]="!selectedImage" (click)="onSave()">
+    <mat-icon>check</mat-icon>
+  </button>
+</mat-toolbar>
