@@ -9,7 +9,10 @@
     "build": "ng build",
     "test": "ng test",
     "lint": "ng lint",
-    "e2e": "ng e2e"
+    "e2e": "ng e2e",
+    "deploy": "npx now && npx now alias",
+    "now-build": "ng build --prod --output-path dist",
+    "now-start": "serve dist --single"
   },
   "private": true,
   "dependencies": {
@@ -53,6 +56,7 @@
     "@types/js-base64": "^2.3.1",
     "@types/node": "~8.9.4",
     "codelyzer": "~4.5.0",
+    "gulp": "^4.0.0",
     "jasmine-core": "~2.99.1",
     "jasmine-spec-reporter": "~4.2.1",
     "karma": "~4.0.0",
@@ -60,6 +64,7 @@
     "karma-coverage-istanbul-reporter": "~2.0.1",
     "karma-jasmine": "~1.1.2",
     "karma-jasmine-html-reporter": "^0.2.2",
+    "now": "^15.0.6",
     "protractor": "~5.4.0",
     "ts-node": "~7.0.0",
     "tslint": "~5.11.0",
